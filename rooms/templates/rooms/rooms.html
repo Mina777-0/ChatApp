@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Front page</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+        <style>
+            body{
+                margin: 0;
+                padding: 15px;
+                background-color: rgb(5, 84, 84);
+                color: white;
+            }
+
+            button{
+                border: thin;
+                border-radius: 15px;
+                padding: 5px;
+                margin: 8px;
+                background-color: rgb(6, 123, 123);
+                color: white;
+                font-size: medium;
+            }
+            
+            a{
+                text-decoration: none;
+                color: white;
+            }
+
+            a:hover{
+                text-decoration: underline;
+            }
+
+            div{
+                text-align: center;
+            }
+            
+        </style>
+       
+    </head>
+    <body>
+        <div>
+            
+            <h1 style="text-align: center;">Chatting Rooms:</h1>
+
+            {% for room in rooms %}
+                <h2>{{ room.name }}</h2>
+                <a href="{% url 'room' room.name %}"><button>Join</button></a>
+
+            {% endfor %}
+    </div>
+    <div>
+        {% if message %}
+            <h2>{{ message }}</h2>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="room" placeholder="create a room">
+            <button type="submit">create</button>
+        </form>
+    </div>
+    </body>
+</html>

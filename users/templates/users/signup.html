@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Front page</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+        <style>
+            body{
+                margin: 0;
+                padding: 15px;
+                background-color: rgb(5, 84, 84);
+                color: white;
+            }
+
+            #signupForm{
+                margin: 110px 470px;
+                border: thin;
+                border-radius: 20px;
+                padding: 25px;
+                background-color: rgb(27, 161, 161);
+                width: 500px;
+                height: 300px;
+                text-align: center;
+            }
+
+            input{
+                border: thin;
+                border-radius: 20px;
+                padding: 8px;
+                margin: 8px;
+            }
+
+            button{
+                border: thin;
+                border-radius: 15px;
+                padding: 5px;
+                margin: 8px;
+                background-color: rgb(6, 123, 123);
+                color: white;
+                font-size: medium;
+            }
+
+            
+        </style>
+        
+
+    </head>
+    <body>
+        <div>
+            <h1 style="text-align: center;">Chat Room</h1>
+
+        <div id="signupForm" class="form-container">
+            {% if user_message %}
+                    <h2>{{user_message}}</h2>
+                {% endif %}
+
+                {% if password_message %}
+                    <h2>{{ password_message }}</h2>
+                {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Username"><br>
+                <input type="email" name="email" placeholder="Email Address"><br>
+                <ul>
+                    <li>Your password must be at least 8 characters</li>
+                    <li>Your password must contain at least one small letter, one capital letter, one number and one symbol</li>
+
+                </ul>
+                <input type="password" name="password1" placeholder="Password"><br>
+                <input type="password" name="password2" placeholder="Confirm Password"><br>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+    </body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Front page</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+        <style>
+            body{
+                margin: 0;
+                padding: 15px;
+                background-color: rgb(5, 84, 84);
+                color: white;
+            }
+
+            button{
+                border: thin;
+                border-radius: 15px;
+                padding: 5px;
+                margin: 8px;
+                background-color: rgb(6, 123, 123);
+                color: white;
+                font-size: medium;
+            }
+            
+            a{
+                text-decoration: none;
+                color: white;
+            }
+
+            a:hover{
+                text-decoration: underline;
+            }
+
+            div{
+                text-align: center;
+            }
+
+            input{
+                border: thin;
+                border-radius: 10px;
+                padding: 8px;
+                margin-top: 8px;
+                margin-right: 2px;
+                width: 400px;
+                height: 50px;
+            }
+
+            button{
+                border: thin;
+                border-radius: 15px;
+                padding: 5px;
+                margin: 2px;
+                background-color: rgb(6, 123, 123);
+                color: white;
+                width: 45px;
+                height: 50px;
+            }
+
+            .screen{
+                width: 400px;
+                height: 400px;
+                background-color: white;
+                margin-left: 34%;
+                border: thin;
+                border-radius: 15px;
+                padding: 15px;
+                overflow-y: scroll;
+            }
+
+            .messages{
+                width: 350px;
+                height: 100px;
+                background-color: rgb(238, 232, 106);
+                border: thin;
+                border-radius: 15px;
+                color: black;
+                text-align: left;
+                padding: 8px;
+                margin-bottom: 10px;
+                
+            }
+            
+        </style>
+       
+    </head>
+    <body>
+        <div> 
+            <h1 style="text-align: center;">{{ room.name }}</h1>
+            <h2>Welcome {{ user.username }} to {{ room.name }}</h2>      
+    </div>
+
+    <div>
+        <div class="screen">
+            {% for message in messages %}
+            <div class="messages">
+                <p style="font-weight: bold;">{{ message.user }}</p>
+                <p>{{ message.content }}</p>
+            </div>
+            {% endfor %}
+
+        </div>
+        <div>
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="message" id="message" placeholder="Your message ...">
+            <button type="button" id="send">send</button>
+        </form>
+        </div>
+    </div>
+
+    {{room.name|json_script:"roomname"}}
+    {{user.username|json_script:"username"}}
+
+    <script>
+        //room.name and user.username are json string are converted as js objects and stored in roomName and username
+        const roomName = JSON.parse(document.getElementById('roomname').textContent);
+        const username = JSON.parse(document.getElementById('username').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function(event){
+            //event is json string we convert it to js object and store it in data variable
+            const data = JSON.parse(event.data);
+            console.log('onmessage:', data);
+
+            if(data.message){
+                let html = '<div class="messages">';
+                    html += '<p style="font-weight: bold;">' + data.username + '</p>';
+                    html += '<p>' + data.message + '</p></div>'
+                document.querySelector('.screen').innerHTML += html;
+
+                scrollToBottom();
+            }
+            
+
+            else{
+                alert("message is empty");
+            }
+        }
+
+        chatSocket.onclose = function(event){
+            console.log('onclose');
+        }
+
+        document.querySelector('#send').onclick = function(event){
+            event.preventDefault();
+            const messageInput = document.querySelector('#message');
+            const message = messageInput.value;
+
+            //here we send js objects as json string to the server 
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'username': username,
+                'room': roomName,
+            }))
+
+            messageInput.value = "";
+        }
+
+        function scrollToBottom(){
+            const objdiv = document.querySelector('.screen');
+            objdiv.scrollTop = objdiv.scrollHeight;
+        }
+
+        scrollToBottom();
+    </script>
+    </body>
+</html>
